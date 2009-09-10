@@ -1,0 +1,17 @@
+all: [% FOREACH project IN projects; "$project/index.html "; END; %] index.html
+
+[% FOREACH project IN projects; %]
+[% project %]/Makefile: [% ttdir %]/Makefile-project.tt2
+	touch [% project %]/Makefile
+
+[% project %]/summary.json:
+	cd [% project %]
+	make summary.json
+	cd ..
+
+[% project %]/index.html: [% project %]/Makefile [% project %]/summary.json
+	cd [% project %]
+	make index.html
+	cd ..
+
+[% END; %]
