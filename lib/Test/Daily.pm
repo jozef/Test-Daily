@@ -21,6 +21,9 @@ use File::Basename 'basename';
 use Archive::Extract;
 use Path::Class 'dir', 'file';
 use Template;
+use Template::Constants qw( :debug );
+use TAP::Formatter::HTML '0.08';
+use TAP::Harness;
 
 our $VERSION = '0.01';
 
@@ -54,7 +57,9 @@ has 'tt_config' => (
     default => sub {
         $_[0]->config->{'tt'}
         || {
-            'INCLUDE_PATH' => [ dir($_[0]->datadir, 'tt-lib')->stringify, dir($_[0]->datadir, 'tt')->stringify ]
+            'INCLUDE_PATH' => [ dir($_[0]->datadir, 'tt-lib')->stringify, dir($_[0]->datadir, 'tt')->stringify ],
+            'DEBUG'        => DEBUG_UNDEF,
+            'OUTPUT_PATH'  => $_[0]->webdir->stringify,
         }
     },
     lazy    => 1,
@@ -108,29 +113,100 @@ sub extract_tarball {
     $ae->extract( to => $extract_to);
 }
 
-sub update_site_makefile {
-    my $self    = shift;
+sub _update_makefile {
+    my $self          = shift;
+    my $makefile_type = shift or die 'set type parameter';
+    my @path          = @_;
+
+    my $path          = dir($self->webdir, @path);
+
     my $tt = $self->tt;
         
-    my @projects;
-    while (my $file = $self->webdir->next) {
+    my @folders;
+    while (my $file = $path->next) {
         next if not -d $file;
-        next if $file eq $self->webdir;
+        next if $file eq $path;
         
         $file = basename($file);        
         next if $file eq '..';
         next if $file eq '_td'; 
                
-        push @projects, $file;
+        push @folders, $file;
     }
     
     $self->tt->process(
-        'Makefile-site.tt2',
+        'Makefile-'.$makefile_type.'.tt2',
         {
-            'projects' => \@projects,
-            'ttdir'    => $self->ttdir,
+            'folders' => \@folders,
+            'ttdir'   => $self->ttdir,
+            'path'    => dir(@path)->stringify,
         },
+        file(@path, 'Makefile')->stringify,
     ) || die $self->tt->error(), "\n";;
+}
+
+sub update_site_makefile {
+    my $self = shift;
+    $self->_update_makefile('site');
+}
+sub update_build_makefile {
+    my $self = shift;
+    $self->_update_makefile('build', @_);
+}
+sub update_build_summary {
+    my $self = shift;
+    
+    my @tests = glob( 't/*.t' );
+    my $fmt = TAP::Formatter::HTML->new;
+    $fmt
+        ->js_uris([$self->config->{'main'}->{'site_prefix'}.'_td/jquery-1.3.2.js', $self->config->{'main'}->{'site_prefix'}.'_td/default_report.js' ])
+        ->css_uris([$self->config->{'main'}->{'site_prefix'}.'_td/default_page.css', $self->config->{'main'}->{'site_prefix'}.'_td/default_report.css'])
+        ->inline_css('')
+        ->force_inline_css(0)
+        ->inline_js('');
+    $fmt->output_file('index.html-new');
+    $fmt->verbosity(-2);
+
+    my $harness = TAP::Harness->new({
+        formatter => $fmt,
+        merge     => 1,
+        lib       => [ 'lib', 'blib/lib', 'blib/arch' ],
+        exec      => [ 'cat' ],
+    });
+
+    my $aggregate = $harness->runtests( @tests );
+
+    # write test summary
+    my @aggregate_methods = qw(
+        get_status
+        elapsed_timestr
+        all_passed
+        
+        failed
+        parse_errors
+        passed
+        planned
+        skipped
+        todo
+        todo_passed
+        wait
+        exit
+        
+        total
+        has_problems
+        has_errors
+    );
+    JSON::Util->encode(
+        { map { $_ => [ $aggregate->$_ ] } @aggregate_methods },
+        'summary.json'
+    );
+    
+    rename('index.html-new', 'index.html');
+}
+
+sub update_project_makefile {
+    my $self = shift;
+    $self->_update_makefile('project', @_);
 }
 
 1;

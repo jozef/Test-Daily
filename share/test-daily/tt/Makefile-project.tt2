@@ -1,0 +1,23 @@
+all: index.html
+
+# index file
+index.html: [% FOREACH build IN folders; "$build/index.html "; END; %]
+	touch index.html
+
+[% FOREACH build IN folders; %]
+# make Makefile for build
+[% build %]/Makefile: [% ttdir %]/Makefile-build.tt2
+	test-daily build-makefile [% path %] [% build %]
+
+# make build index.html
+[% build %]/index.html: [% build %]/Makefile
+	cd [% build %] && make
+
+[%- END; -%]
+
+# clean up the mess
+clean:
+	rm -f index.html
+[% FOREACH build IN folders; -%]
+	cd [% build %] && make clean
+[% END; -%]

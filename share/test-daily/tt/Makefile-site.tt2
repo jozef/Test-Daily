@@ -1,17 +1,23 @@
-all: [% FOREACH project IN projects; "$project/index.html "; END; %] index.html
+all: index.html
 
-[% FOREACH project IN projects; %]
+# index file
+index.html: [% FOREACH project IN folders; "$project/index.html "; END; %]
+	touch index.html
+
+[% FOREACH project IN folders; -%]
+# project Makefile
 [% project %]/Makefile: [% ttdir %]/Makefile-project.tt2
-	touch [% project %]/Makefile
+	test-daily project-makefile [% project %]
 
-[% project %]/summary.json:
-	cd [% project %]
-	make summary.json
-	cd ..
+# project index page
+[% project %]/index.html: [% project %]/Makefile
+	cd [% project %] && make
 
-[% project %]/index.html: [% project %]/Makefile [% project %]/summary.json
-	cd [% project %]
-	make index.html
-	cd ..
+[%- END; -%]
 
-[% END; %]
+# clean up the mess
+clean:
+	rm -f index.html
+[% FOREACH project IN folders; -%]
+	cd [% project %] && make clean
+[% END; -%]
