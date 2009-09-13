@@ -24,6 +24,7 @@ use Template;
 use Template::Constants qw( :debug );
 use TAP::Formatter::HTML '0.08';
 use TAP::Harness;
+use JSON::Util;
 
 our $VERSION = '0.01';
 
@@ -59,7 +60,6 @@ has 'tt_config' => (
         || {
             'INCLUDE_PATH' => [ dir($_[0]->datadir, 'tt-lib')->stringify, dir($_[0]->datadir, 'tt')->stringify ],
             'DEBUG'        => DEBUG_UNDEF,
-            'OUTPUT_PATH'  => $_[0]->webdir->stringify,
         }
     },
     lazy    => 1,
@@ -81,6 +81,26 @@ has 'tt' => (
     isa     => 'Template',
     default => sub { Template->new($_[0]->tt_config) || die $Template::ERROR, "\n" },
     lazy    => 1,
+);
+
+our @aggregate_methods = qw(
+    get_status
+    elapsed_timestr
+    all_passed
+    
+    failed
+    parse_errors
+    passed
+    planned
+    skipped
+    todo
+    todo_passed
+    wait
+    exit
+    
+    total
+    has_problems
+    has_errors
 );
 
 
@@ -113,15 +133,9 @@ sub extract_tarball {
     $ae->extract( to => $extract_to);
 }
 
-sub _update_makefile {
-    my $self          = shift;
-    my $makefile_type = shift or die 'set type parameter';
-    my @path          = @_;
-
-    my $path          = dir($self->webdir, @path);
-
-    my $tt = $self->tt;
-        
+sub _all_folders {
+    my $self = shift;
+    my $path = dir();
     my @folders;
     while (my $file = $path->next) {
         next if not -d $file;
@@ -133,25 +147,60 @@ sub _update_makefile {
                
         push @folders, $file;
     }
+    return @folders;
+}
+
+sub _process {
+    my $self         = shift;
+    my $template     = shift or die 'set template parameter';
+    my $out_filename = shift or die 'set out_filename parameter';
+
+    my $tt   = $self->tt;
     
     $self->tt->process(
-        'Makefile-'.$makefile_type.'.tt2',
+        $template,
         {
-            'folders' => \@folders,
+            'folders' => [ $self->_all_folders ],
             'ttdir'   => $self->ttdir,
-            'path'    => dir(@path)->stringify,
+            'json'    => JSON::Util->new(),
         },
-        file(@path, 'Makefile')->stringify,
+        $out_filename,
     ) || die $self->tt->error(), "\n";;
+}
+
+sub _process_summary {
+    my $self         = shift;
+    
+    my %summary;
+    my $all_passed = 0;
+    my $has_errors = 0;
+    foreach my $folder ($self->_all_folders) {
+        my $folder_summary = JSON::Util->decode([ $folder, 'summary.json' ]);
+        $all_passed += $folder_summary->{'all_passed'}->[0] || 0;
+        $has_errors += $folder_summary->{'has_errors'}->[0] || 0;
+    }
+    $summary{'all_passed'} = [ $all_passed ];
+    $summary{'has_errors'} = [ $has_errors ];
+    
+    JSON::Util->encode(\%summary, [ 'summary.json' ]);
 }
 
 sub update_site_makefile {
     my $self = shift;
-    $self->_update_makefile('site');
+    chdir($self->webdir);
+    $self->_process('Makefile-site.tt2', 'Makefile');
+}
+sub update_project_makefile {
+    my $self   = shift;
+    my $folder = shift or die 'pass folder argument';
+    chdir($folder);
+    $self->_process('Makefile-project.tt2', 'Makefile');
 }
 sub update_build_makefile {
     my $self = shift;
-    $self->_update_makefile('build', @_);
+    my $folder = shift or die 'pass folder argument';
+    chdir($folder);
+    $self->_process('Makefile-build.tt2', 'Makefile', @_);
 }
 sub update_build_summary {
     my $self = shift;
@@ -177,25 +226,6 @@ sub update_build_summary {
     my $aggregate = $harness->runtests( @tests );
 
     # write test summary
-    my @aggregate_methods = qw(
-        get_status
-        elapsed_timestr
-        all_passed
-        
-        failed
-        parse_errors
-        passed
-        planned
-        skipped
-        todo
-        todo_passed
-        wait
-        exit
-        
-        total
-        has_problems
-        has_errors
-    );
     JSON::Util->encode(
         { map { $_ => [ $aggregate->$_ ] } @aggregate_methods },
         'summary.json'
@@ -204,10 +234,17 @@ sub update_build_summary {
     rename('index.html-new', 'index.html');
 }
 
-sub update_project_makefile {
+sub update_project_summary {
     my $self = shift;
-    $self->_update_makefile('project', @_);
+    $self->_process_summary();
+    $self->_process('project.tt2', 'index.html');
 }
+sub update_site_summary {
+    my $self = shift;
+    $self->_process_summary();
+    $self->_process('site.tt2', 'index.html');    
+}
+
 
 1;
 

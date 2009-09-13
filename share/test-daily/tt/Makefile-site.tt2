@@ -1,8 +1,8 @@
 all: index.html
 
 # index file
-index.html: [% FOREACH project IN folders; "$project/index.html "; END; %]
-	touch index.html
+index.html: [% ttdir %]/site.tt2 [% FOREACH project IN folders; "$project/index.html "; END; %]
+	test-daily build-site-summary
 
 [% FOREACH project IN folders; -%]
 # project Makefile

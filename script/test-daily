@@ -39,8 +39,6 @@ sub main {
 	pod2usage if not $command;
 	my $what    = shift @ARGV;
 	pod2usage if not $what and ($command ~~ [qw(tarball project-makefile)]);
-	my $what2   = shift @ARGV;
-	pod2usage if not $what and ($command ~~ [qw(build-makegile)]);
 	
 	my $td = Test::Daily->new();
 	
@@ -48,8 +46,10 @@ sub main {
 		when ('tarball') { $td->extract_tarball($what); }
 		when ('site-makefile')    { $td->update_site_makefile; }
 		when ('project-makefile') { $td->update_project_makefile($what); }
-		when ('build-makefile')   { $td->update_build_makefile($what, $what2); }
-		when ('build-summary')    { $td->update_build_summary($what, $what2); }
+		when ('build-makefile')   { $td->update_build_makefile($what); }
+		when ('build-summary')    { $td->update_build_summary($what); }
+		when ('build-project-summary') { $td->update_project_summary(); }
+		when ('build-site-summary') { $td->update_site_summary(); }
 		default { pod2usage; }
 	}
 	

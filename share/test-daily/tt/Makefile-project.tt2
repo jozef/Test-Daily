@@ -1,13 +1,13 @@
 all: index.html
 
 # index file
-index.html: [% FOREACH build IN folders; "$build/index.html "; END; %]
-	touch index.html
+index.html: [% ttdir %]/project.tt2 [% FOREACH build IN folders; "$build/index.html "; END; %]
+	test-daily build-project-summary
 
 [% FOREACH build IN folders; %]
 # make Makefile for build
 [% build %]/Makefile: [% ttdir %]/Makefile-build.tt2
-	test-daily build-makefile [% path %] [% build %]
+	test-daily build-makefile [% build %]
 
 # make build index.html
 [% build %]/index.html: [% build %]/Makefile
