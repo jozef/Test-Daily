@@ -129,8 +129,11 @@ sub extract_tarball {
         $index = sprintf('_%03d', $i);
         $i++;
     } while -d $extract_to;
-    mkpath($extract_to);
+    mkpath($extract_to->stringify) or die $extract_to.' - '.$!;
     $ae->extract( to => $extract_to);
+    
+    # remove Makefile needs to be regenerated
+    unlink(dir($self->webdir, $name, 'Makefile')->stringify);
 }
 
 sub _all_folders {
