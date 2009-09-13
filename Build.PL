@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Module::Build;
+use Module::Build::SysPath;
 
 use 5.010;
 
@@ -20,6 +20,15 @@ my $builder = Module::Build::SysPath->new(
         'Test::More'        => 0,
         'Test::Differences' => 0,
         'File::Temp'        => 0,
+    },
+    script_files => [
+        'script/test-daily',
+    ],
+    webdir_files => {
+        'www/test-daily/_td/default_page.css' => '',
+        'www/test-daily/_td/default_report.css' => '',
+        'www/test-daily/_td/default_report.js' => '',
+        'www/test-daily/_td/jquery-1.3.2.js' => '',
     },
     add_to_cleanup      => [ 'Test-Daily-*' ],
     create_readme       => 1,

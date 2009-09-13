@@ -2,11 +2,13 @@ package Test::Daily;
 
 =head1 NAME
 
+Test::Daily - daily testing reports
+
 =head1 SYNOPSIS
 
     use Test::Daily;
     my $td = Test::Daily->new();
-    $td->process_tarball('my-test-tap-archive.tar.gz');
+    $td->extract_tarball('my-test-tap-archive_version_arch.tar.gz');
     
 =head1 DESCRIPTION
 

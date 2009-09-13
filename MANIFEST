@@ -1,0 +1,26 @@
+Build.PL
+Changes
+conf/test-daily/test-daily.conf
+lib/Test/Daily.pm
+lib/Test/Daily/SPc.pm
+MANIFEST			This list of files
+script/test-daily
+share/test-daily/tt-lib/_footer.tt2
+share/test-daily/tt-lib/_header.tt2
+share/test-daily/tt/Makefile-build.tt2
+share/test-daily/tt/Makefile-project.tt2
+share/test-daily/tt/Makefile-site.tt2
+share/test-daily/tt/project.tt2
+share/test-daily/tt/site.tt2
+t/00_compile.t
+t/distribution.t
+t/fixme.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+www/test-daily/_td/default_page.css
+www/test-daily/_td/default_report.css
+www/test-daily/_td/default_report.js
+www/test-daily/_td/jquery-1.3.2.js
+README
+META.yml
