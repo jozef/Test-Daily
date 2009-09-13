@@ -9,6 +9,14 @@ Test::Daily - daily testing reports
     use Test::Daily;
     my $td = Test::Daily->new();
     $td->extract_tarball('my-test-tap-archive_version_arch.tar.gz');
+    $td->update_site_makefile;
+    $td->update_project_makefile($folder);
+    $td->update_test_makefile($folder);
+    $td->update_test_summary();
+    $td->update_project_summary();
+    $td->update_site_summary();
+
+See `test-daily` script.
     
 =head1 DESCRIPTION
 
@@ -72,10 +80,10 @@ has 'ttdir' => (
     default => sub { dir($_[0]->datadir, 'tt') },
     lazy    => 1,
 );
-has 'site_prefix' => (
+has 'static_prefix' => (
     is      => 'rw',
     isa     => 'Str',
-    default => sub { $_[0]->config->{'main'}->{'site_prefix'} || '/test-server/' },
+    default => sub { $_[0]->config->{'main'}->{'static_prefix'} || '/test-server' },
     lazy    => 1,
 );
 has 'tt' => (
@@ -111,6 +119,10 @@ our @aggregate_methods = qw(
 =head2 new()
 
 Object constructor.
+
+=head2 extract_tarball($tarball)
+
+Extract L<TAP::Harness::Archive>.
 
 =cut
 
@@ -190,31 +202,50 @@ sub _process_summary {
     JSON::Util->encode(\%summary, [ 'summary.json' ]);
 }
 
+=head2 update_site_makefile
+
+=cut
+
 sub update_site_makefile {
     my $self = shift;
     chdir($self->webdir);
     $self->_process('Makefile-site.tt2', 'Makefile');
 }
+
+=head2 update_project_makefile($folder)
+
+=cut
+
 sub update_project_makefile {
     my $self   = shift;
     my $folder = shift or die 'pass folder argument';
     chdir($folder);
     $self->_process('Makefile-project.tt2', 'Makefile');
 }
-sub update_build_makefile {
+
+=head2 update_test_makefile($folder)
+
+=cut
+
+sub update_test_makefile {
     my $self = shift;
     my $folder = shift or die 'pass folder argument';
     chdir($folder);
-    $self->_process('Makefile-build.tt2', 'Makefile', @_);
+    $self->_process('Makefile-test.tt2', 'Makefile', @_);
 }
-sub update_build_summary {
+
+=head2 update_test_summary
+
+=cut
+
+sub update_test_summary {
     my $self = shift;
     
     my @tests = glob( 't/*.t' );
     my $fmt = TAP::Formatter::HTML->new;
     $fmt
-        ->js_uris([$self->config->{'main'}->{'site_prefix'}.'_td/jquery-1.3.2.js', $self->config->{'main'}->{'site_prefix'}.'_td/default_report.js' ])
-        ->css_uris([$self->config->{'main'}->{'site_prefix'}.'_td/default_page.css', $self->config->{'main'}->{'site_prefix'}.'_td/default_report.css'])
+        ->js_uris([$self->config->{'main'}->{'static_prefix'}.'_td/jquery-1.3.2.js', $self->config->{'main'}->{'static_prefix'}.'_td/default_report.js' ])
+        ->css_uris([$self->config->{'main'}->{'static_prefix'}.'_td/default_page.css', $self->config->{'main'}->{'static_prefix'}.'_td/default_report.css'])
         ->inline_css('')
         ->force_inline_css(0)
         ->inline_js('');
@@ -239,11 +270,20 @@ sub update_build_summary {
     rename('index.html-new', 'index.html');
 }
 
+=head2 update_project_summary
+
+=cut
+
 sub update_project_summary {
     my $self = shift;
     $self->_process_summary();
     $self->_process('project.tt2', 'index.html');
 }
+
+=head2 update_site_summary
+
+=cut
+
 sub update_site_summary {
     my $self = shift;
     $self->_process_summary();
@@ -251,7 +291,7 @@ sub update_site_summary {
 }
 
 
-1;
+'hu?';
 
 
 __END__
@@ -317,5 +357,3 @@ under the same terms as Perl itself.
 
 
 =cut
-
-1; # End of Test::Daily

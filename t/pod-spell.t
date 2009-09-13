@@ -20,5 +20,8 @@ add_stopwords(qw(
 	RT
 	CPAN
 	AnnoCPAN
+	datadir
+	sysconfdir
+	webdir
 ));
 all_pod_files_spelling_ok();

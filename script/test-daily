@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-test-daily-process-tarball - process tar ball fro Test::Daily
+test-daily-process-tarball - process tarball for Test::Daily
 
 =head1 SYNOPSIS
 
@@ -11,6 +11,11 @@ test-daily-process-tarball - process tar ball fro Test::Daily
 	COMMAND is one of:
 		tarball some_12345_i386.tar.gz
 		site-makefile
+		site-summary
+		project-makefile
+		project-summary
+		test-makefile
+		test-summary
 
 =head1 DESCRIPTION
 
@@ -46,10 +51,10 @@ sub main {
 		when ('tarball') { $td->extract_tarball($what); }
 		when ('site-makefile')    { $td->update_site_makefile; }
 		when ('project-makefile') { $td->update_project_makefile($what); }
-		when ('build-makefile')   { $td->update_build_makefile($what); }
-		when ('build-summary')    { $td->update_build_summary($what); }
-		when ('build-project-summary') { $td->update_project_summary(); }
-		when ('build-site-summary') { $td->update_site_summary(); }
+		when ('test-makefile')   { $td->update_test_makefile($what); }
+		when ('test-summary')    { $td->update_test_summary($what); }
+		when ('project-summary') { $td->update_project_summary(); }
+		when ('site-summary') { $td->update_site_summary(); }
 		default { pod2usage; }
 	}
 	

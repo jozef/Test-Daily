@@ -27,6 +27,8 @@ sub _path_types {qw(
 
 =head2 datadir
 
+=head2 webdir
+
 =cut
 
 sub prefix     { use Module::Build::SysPath; Module::Build::SysPath->find_distribution_root(__PACKAGE__); };

@@ -2,7 +2,7 @@ all: index.html
 
 # index file
 index.html: meta.yml
-	test-daily build-summary
+	test-daily test-summary
 
 # clean up the mess
 clean:

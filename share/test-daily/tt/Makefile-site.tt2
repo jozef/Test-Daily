@@ -2,7 +2,7 @@ all: index.html
 
 # index file
 index.html: [% ttdir %]/site.tt2 [% FOREACH project IN folders; "$project/index.html "; END; %]
-	test-daily build-site-summary
+	test-daily site-summary
 
 [% FOREACH project IN folders; -%]
 # project Makefile

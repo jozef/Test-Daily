@@ -30,6 +30,9 @@ my $builder = Module::Build::SysPath->new(
         'www/test-daily/_td/default_report.js' => '',
         'www/test-daily/_td/jquery-1.3.2.js' => '',
     },
+    conffiles => [
+        [ 'conf', 'test-daily', 'test-daily.conf' ],
+    ],
     add_to_cleanup      => [ 'Test-Daily-*' ],
     create_readme       => 1,
     sign                => 1,
