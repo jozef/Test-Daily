@@ -36,7 +36,7 @@ use TAP::Formatter::HTML '0.08';
 use TAP::Harness;
 use JSON::Util;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has 'datadir' => (
     is      => 'rw',

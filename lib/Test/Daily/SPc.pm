@@ -9,7 +9,7 @@ Test::Daily::SPc - build-time system path configuration
 use warnings;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.02';
 
 use File::Spec;
 
