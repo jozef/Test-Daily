@@ -20,6 +20,24 @@ See `test-daily` script.
     
 =head1 DESCRIPTION
 
+=head1 USAGE
+
+=head2 TAP::Harness::Archive
+
+Use L<TAP::Harness::Archive> to create tarball of the test output. Simply
+install it and run F<prove> with C<--archive> option.
+
+    prove --archive name_version_arch.tar.gz
+    prove --archive test-project-name_20090927_i386.tar.gz
+
+=head2 Create pages with test output
+
+On server where the pages will be hosted (generated):
+
+    test-daily tarball test-project-name_20090927_i386.tar.gz
+    test-daily site-makefile
+    test-daily make
+
 =cut
 
 use Moose;
@@ -288,6 +306,17 @@ sub update_site_summary {
     my $self = shift;
     $self->_process_summary();
     $self->_process('site.tt2', 'index.html');    
+}
+
+=head2 run_make($target)
+
+=cut
+
+sub run_make {
+    my $self = shift;
+    my $what = shift;
+    
+    system('cd '.$self->webdir->stringify.'; make'.($what ? ' '.$what : '')) and die $!;
 }
 
 

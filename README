@@ -15,6 +15,23 @@ SYNOPSIS
     See `test-daily` script.
 
 DESCRIPTION
+USAGE
+  TAP::Harness::Archive
+
+    Use TAP::Harness::Archive to create tarball of the test output. Simply
+    install it and run prove with `--archive' option.
+
+        prove --archive name_version_arch.tar.gz
+        prove --archive test-project-name_20090927_i386.tar.gz
+
+  Create pages with test output
+
+    On server where the pages will be hosted (generated):
+
+        test-daily tarball test-project-name_20090927_i386.tar.gz
+        test-daily site-makefile
+        test-daily make
+
 METHODS
   new()
 
@@ -35,6 +52,8 @@ METHODS
   update_project_summary
 
   update_site_summary
+
+  run_make($target)
 
 AUTHOR
     Jozef Kutej
