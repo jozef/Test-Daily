@@ -7,7 +7,7 @@ index.html: summary.json rss.xml
 summary.json: meta.yml
 	test-daily test-summary
 
-rss.xml: summary.json [% ttdir %]/summary2rssfeed.tt2 [% ttlibdir %]/atom.tt2
+rss.xml: summary.json [% ttdir %]/summary2rssfeed.tt2 [% ttlibdir %]/atom.tt2 [% ttlibdir %]/test-feed-summary.tt2
 	test-daily summary2rssfeed [% "${project}/${curfolder}" %]
 
 # clean up the mess
