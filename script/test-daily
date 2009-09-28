@@ -52,11 +52,12 @@ sub main {
 		when ('tarball') { $td->extract_tarball($what); }
 		when ('site-makefile')    { $td->update_site_makefile; }
 		when ('project-makefile') { $td->update_project_makefile($what); }
-		when ('test-makefile')   { $td->update_test_makefile($what); }
+		when ('test-makefile')   { $td->update_test_makefile($what, @ARGV); }
 		when ('test-summary')    { $td->update_test_summary($what); }
 		when ('project-summary') { $td->update_project_summary(); }
 		when ('site-summary') { $td->update_site_summary(); }
 		when ('make') { $td->run_make($what); }
+		when ('summary2rssfeed') { $td->summary2rssfeed($what); }
 		default { pod2usage; }
 	}
 	

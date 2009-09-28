@@ -7,7 +7,7 @@ index.html: [% ttdir %]/project.tt2 [% FOREACH test IN folders; "$test/index.htm
 [% FOREACH test IN folders; %]
 # make Makefile for test
 [% test %]/Makefile: [% ttdir %]/Makefile-test.tt2
-	test-daily test-makefile [% test %]
+	test-daily test-makefile [% test %] [% curfolder %]
 
 # make index.html
 [% test %]/index.html: [% test %]/Makefile

@@ -24,6 +24,7 @@ my $builder = Module::Build::SysPath->new(
         'TAP::Harness'         => 0,
         'Getopt::Long'         => 0,
         'Pod::Usage'           => 0,
+        'YAML::Syck'           => 0,
     },
     configure_requires => {
         'Module::Build::SysPath' => 0.08,
