@@ -9,11 +9,16 @@ README
 script/test-daily
 share/test-daily/tt-lib/_footer.tt2
 share/test-daily/tt-lib/_header.tt2
+share/test-daily/tt-lib/atom.tt2
+share/test-daily/tt-lib/test-feed-summary.tt2
 share/test-daily/tt/Makefile-project.tt2
 share/test-daily/tt/Makefile-site.tt2
 share/test-daily/tt/Makefile-test.tt2
 share/test-daily/tt/project.tt2
 share/test-daily/tt/site.tt2
+share/test-daily/tt/summary2rssfeed.tt2
+share/test-daily/xsd/atom.xsd
+share/test-daily/xsd/xml.xsd
 t/00_compile.t
 t/distribution.t
 t/fixme.t
