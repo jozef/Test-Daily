@@ -12,4 +12,4 @@ rss.xml: summary.json [% ttdir %]/summary2rssfeed.tt2 [% ttlibdir %]/atom.tt2 [%
 
 # clean up the mess
 clean:
-	rm -f index.html index.html-new summary.json
+	rm -f index.html index.html-new summary.json rss.xml

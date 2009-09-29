@@ -17,8 +17,8 @@
     <title>[% entry.title %]</title>
     <link href="[% entry.link %]"/>
     <id>[% entry.id %]</id>
-    <updated>[% entry.update %]</updated>
-    <summary>[% entry.summary %]</summary>
+    <updated>[% entry.updated %]</updated>
+    <summary type="html">[% entry.summary %]</summary>
   </entry>
 [% END -%]
 

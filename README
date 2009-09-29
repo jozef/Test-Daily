@@ -55,6 +55,10 @@ METHODS
 
   run_make($target)
 
+  summary2rssfeed
+
+  aggregatefeeds
+
 AUTHOR
     Jozef Kutej
 

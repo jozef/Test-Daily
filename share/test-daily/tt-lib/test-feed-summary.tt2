@@ -1,3 +1,4 @@
+&lt;pre&gt;
 START  [% date.format(summary.meta.start_time, '%Y-%m-%dT%H:%M:%S') %]
 FINISH [% date.format(summary.meta.stop_time, '%Y-%m-%dT%H:%M:%S') %]
 [% summary.elapsed_timestr.0 %]
@@ -16,3 +17,4 @@ OK [% pass %]
 [% END; -%]
 
 TOTAL TESTS [% summary.total.0 %]
+&lt;/pre&gt;

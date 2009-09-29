@@ -1,8 +1,15 @@
 all: index.html
 
 # index file
-index.html: [% ttdir %]/site.tt2 [% FOREACH project IN folders; "$project/index.html "; END; %]
+# index file + summary
+index.html: summary.json rss.xml
+	touch index.html    # index.html is created together with summary.json
+
+summary.json: [% ttdir %]/site.tt2 [% FOREACH project IN folders; "$project/index.html "; END; %]
 	test-daily site-summary
+
+rss.xml: [% ttlibdir %]/atom.tt2 [% FOREACH project IN folders; "$project/rss.xml "; END; %]
+	test-daily aggregatefeeds
 
 [% FOREACH project IN folders; -%]
 # project Makefile
@@ -17,7 +24,7 @@ index.html: [% ttdir %]/site.tt2 [% FOREACH project IN folders; "$project/index.
 
 # clean up the mess
 clean:
-	rm -f index.html
+	rm -f index.html rss.xml rss-fail.xml
 [% FOREACH project IN folders; -%]
 	cd [% project %] && make clean
 [% END; -%]

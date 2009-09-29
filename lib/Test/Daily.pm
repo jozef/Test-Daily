@@ -54,6 +54,8 @@ use TAP::Formatter::HTML '0.08';
 use TAP::Harness;
 use JSON::Util;
 use YAML::Syck ();
+use XML::LibXML;
+use HTML::Entities 'encode_entities';
 
 our $VERSION = '0.02';
 
@@ -355,6 +357,60 @@ sub summary2rssfeed {
         {
             'title' => $title,
             'link'  => 'http://'.$self->site_hostname.$self->site_prefix.$path.'/',
+        }
+    );
+}
+
+=head2 aggregatefeeds
+
+=cut
+
+sub aggregatefeeds {
+    my $self  = shift;
+    my $title = shift;
+    
+    my $parser = XML::LibXML->new;
+    my $xpc = XML::LibXML::XPathContext->new();
+    
+    my @entries;
+    foreach my $folder ($self->_all_folders) {
+        my $feed = $parser->parse_file(file($folder, 'rss.xml'));
+        $xpc->registerNs('atom', 'http://www.w3.org/2005/Atom');
+        push @entries, $xpc->findnodes('/atom:feed/atom:entry', $feed);
+    }
+    @entries =
+        sort { $a->{'updated'} cmp $b->{'updated'} }
+        map {{
+            'title'   => encode_entities($xpc->findvalue('atom:title', $_), '<>&'),
+            'link'    => encode_entities($xpc->findvalue('atom:link/@href', $_), '<>&'),
+            'id'      => encode_entities($xpc->findvalue('atom:id', $_), '<>&'),
+            'updated' => encode_entities($xpc->findvalue('atom:updated', $_), '<>&'),
+            'summary' => encode_entities($xpc->findvalue('atom:summary', $_), '<>&'),
+    }} @entries;
+    my @ids = map { $_->{'id'} } @entries;
+
+    $self->_process(
+        'atom.tt2',
+        'rss.xml',
+        {
+            'title'   => $title || 'Test::Daily',
+            'link'  => 'http://'.$self->site_hostname.$self->site_prefix.($title ? $title.'/' : ''),
+            'ids'     => \@ids,
+            'entries' => \@entries,
+        }
+    );
+    
+    @entries = grep { $_->{'title'} =~ m/^FAIL \s/xms } @entries;
+    @ids = map { $_->{'id'} } @entries;
+    
+    $self->_process(
+        'atom.tt2',
+        'rss-fail.xml',
+        {
+            'title'   => $title || 'Test::Daily',
+            'link'  => 'http://'.$self->site_hostname.$self->site_prefix.($title ? $title.'/' : ''),
+            'ids'     => \@ids,
+            'entries' => \@entries,
         }
     );
 }

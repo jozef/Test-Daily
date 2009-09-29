@@ -25,6 +25,8 @@ my $builder = Module::Build::SysPath->new(
         'Getopt::Long'         => 0,
         'Pod::Usage'           => 0,
         'YAML::Syck'           => 0,
+        'XML::LibXML'          => 0,
+        'HTML::Entities'       => 0,
     },
     configure_requires => {
         'Module::Build::SysPath' => 0.08,
