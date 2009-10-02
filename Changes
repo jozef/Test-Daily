@@ -1,5 +1,8 @@
 Revision history for Test-Daily
 
+0.03    02 Oct 2009
+    - fixes to work with Test::Install::METArequires
+
 0.02    27 Sep 2009
     - all dependecies
     - `test-daily make` added

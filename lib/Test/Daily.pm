@@ -29,6 +29,9 @@ install it and run F<prove> with C<--archive> option.
 
     prove --archive name_version_arch.tar.gz
     prove --archive test-project-name_20090927_i386.tar.gz
+    prove --archive test-project-name_20090927_i386.tar.gz 
+    prove --archive test-project-name_20090927_i386.tar.gz -v -Ilib \
+        `perl -MTest::iMETAr -le 'print Test::iMETAr->t_file'` t/
 
 =head2 Create pages with test output
 
@@ -57,7 +60,7 @@ use YAML::Syck ();
 use XML::LibXML;
 use HTML::Entities 'encode_entities';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has 'datadir' => (
     is      => 'rw',
@@ -278,7 +281,9 @@ sub update_test_makefile {
 sub update_test_summary {
     my $self = shift;
     
-    my @tests = glob( 't/*.t' );
+    my $meta_yaml = YAML::Syck::LoadFile('meta.yml');
+    
+    my @tests = map { s{^/}{};$_; } @{$meta_yaml->{'file_order'}};
     my $fmt = TAP::Formatter::HTML->new;
     $fmt
         ->js_uris([$self->config->{'main'}->{'site_prefix'}.'_td/jquery-1.3.2.js', $self->config->{'main'}->{'site_prefix'}.'_td/default_report.js' ])
@@ -302,7 +307,7 @@ sub update_test_summary {
     JSON::Util->encode(
         {
             (map { $_ => [ $aggregate->$_ ] } @aggregate_methods),
-            'meta' => YAML::Syck::LoadFile('meta.yml'),
+            'meta' => $meta_yaml,
         },
         'summary.json'
     );
