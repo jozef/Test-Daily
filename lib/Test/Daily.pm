@@ -27,10 +27,10 @@ See `test-daily` script.
 Use L<TAP::Harness::Archive> to create tarball of the test output. Simply
 install it and run F<prove> with C<--archive> option.
 
-    prove --archive name_version_arch.tar.gz
-    prove --archive test-project-name_20090927_i386.tar.gz
-    prove --archive test-project-name_20090927_i386.tar.gz 
-    prove --archive test-project-name_20090927_i386.tar.gz -v -Ilib \
+    prove -v --archive name_version_arch.tar.gz
+    prove -v --archive test-project-name_20090927_i386.tar.gz
+    prove -v --archive test-project-name_20090927_i386.tar.gz 
+    prove -v --archive test-project-name_20090927_i386.tar.gz -v -Ilib \
         `perl -MTest::iMETAr -le 'print Test::iMETAr->t_file'` t/
 
 =head2 Create pages with test output
@@ -164,8 +164,19 @@ Extract L<TAP::Harness::Archive>.
 
 sub extract_tarball {
     my $self    = shift;
-    my $tarball = shift or croak 'pass tarball as argument';
+    my @tarballs = @_;
     
+    croak 'pass tarball as argument'
+        if not @tarballs;
+    
+    if (@tarballs > 1) {
+        foreach my $tarball (@tarballs) {
+            $self->extract_tarball($tarball);
+        }
+        return;
+    }
+    
+    my $tarball = shift @tarballs;
     croak 'tarball name "'.basename($tarball).'" format unknown'
         if basename($tarball) !~ m/^(.+)_(.+)_(.+)\.(?:tar\.gz|zip)$/xms;
     my ($name, $version, $arch) = ($1, $2, $3);
@@ -182,8 +193,9 @@ sub extract_tarball {
     mkpath($extract_to->stringify) or die $extract_to.' - '.$!;
     $ae->extract( to => $extract_to);
     
-    # remove Makefile needs to be regenerated
+    # remove project Makefile needs to be regenerated, and create new site Makefile
     unlink(dir($self->webdir, $name, 'Makefile')->stringify);
+    $self->update_site_makefile;
 }
 
 sub _all_folders {

@@ -29,10 +29,10 @@ my $builder = Module::Build::SysPath->new(
         'HTML::Entities'       => 0,
     },
     configure_requires => {
-        'Module::Build::SysPath' => 0.08,
+        'Module::Build::SysPath' => 0.09,
     },
     build_requires => {
-        'Module::Build::SysPath' => 0.08,
+        'Module::Build::SysPath' => 0.09,
         'Test::More'        => 0,
         'Test::Differences' => 0,
         'File::Temp'        => 0,

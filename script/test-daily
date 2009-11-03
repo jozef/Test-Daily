@@ -49,7 +49,7 @@ sub main {
 	my $td = Test::Daily->new();
 	
 	given ($command) {
-		when ('tarball') { $td->extract_tarball($what); }
+		when ('tarball') { $td->extract_tarball($what, @ARGV); }
 		when ('site-makefile')    { $td->update_site_makefile; }
 		when ('project-makefile') { $td->update_project_makefile($what); }
 		when ('test-makefile')    { $td->update_test_makefile($what, @ARGV); }
