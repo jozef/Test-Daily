@@ -27,10 +27,10 @@ See `test-daily` script.
 Use L<TAP::Harness::Archive> to create tarball of the test output. Simply
 install it and run F<prove> with C<--archive> option.
 
-    prove -v --archive name_version_arch.tar.gz
-    prove -v --archive test-project-name_20090927_i386.tar.gz
-    prove -v --archive test-project-name_20090927_i386.tar.gz 
-    prove -v --archive test-project-name_20090927_i386.tar.gz -v -Ilib \
+    prove --merge -v --archive name_version_arch.tar.gz
+    prove --merge -v --archive test-project-name_20090927_i386.tar.gz
+    prove --merge -v --archive test-project-name_20090927_i386.tar.gz 
+    prove --merge -v --archive test-project-name_20090927_i386.tar.gz -v -Ilib \
         `perl -MTest::iMETAr -le 'print Test::iMETAr->t_file'` t/
 
 =head2 Create pages with test output
